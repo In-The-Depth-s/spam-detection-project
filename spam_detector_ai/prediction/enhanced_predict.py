@@ -11,34 +11,34 @@ from spam_detector_ai.loading_and_processing.feature_extractor import EnhancedFe
 
 class EnhancedSpamDetector:
     """
-    Enhanced spam detector that combines traditional ML models with 
+    Enhanced spam detector that combines traditional ML models with
     URL analysis and email validation for improved accuracy.
     """
-    
+
     def __init__(self):
         self.base_detector = VotingSpamDetector()
         self.feature_extractor = EnhancedFeatureExtractor()
-        
+
         # Threshold for combined scoring
         self.spam_threshold = 0.5
         # Weight for feature-based scoring vs ML-based scoring
         self.feature_weight = 0.3
         self.ml_weight = 0.7
-    
-    def is_spam(self, 
+
+    def is_spam(self,
                 message: str,
                 subject: Optional[str] = None,
                 sender_email: Optional[str] = None,
                 return_details: bool = False) -> Union[bool, Dict]:
         """
         Determine if a message is spam using enhanced features.
-        
+
         Args:
             message: The email message content
             subject: Optional email subject line
             sender_email: Optional sender email address
             return_details: If True, return detailed analysis instead of just boolean
-            
+
         Returns:
             Boolean indicating if message is spam, or dict with details if return_details=True
         """
@@ -48,20 +48,20 @@ class EnhancedSpamDetector:
             subject=subject,
             sender_email=sender_email
         )
-        
+
         # Get ML prediction (using traditional model)
         ml_prediction = self.base_detector.is_spam(message)
         ml_score = 1.0 if ml_prediction else 0.0
-        
+
         # Get feature-based score
         feature_score = features['combined_spam_score']
-        
+
         # Combine scores with weights
         combined_score = (ml_score * self.ml_weight) + (feature_score * self.feature_weight)
-        
+
         # Make final decision
         is_spam_result = combined_score >= self.spam_threshold
-        
+
         if return_details:
             return {
                 'is_spam': is_spam_result,
@@ -71,9 +71,9 @@ class EnhancedSpamDetector:
                 'features': features,
                 'details': self._generate_details(features, ml_prediction)
             }
-        
+
         return is_spam_result
-    
+
     def _generate_details(self, features: Dict, ml_prediction: bool) -> Dict[str, str]:
         """Generate human-readable details about the decision."""
         details = {
@@ -82,7 +82,7 @@ class EnhancedSpamDetector:
             'email_analysis': '',
             'content_analysis': ''
         }
-        
+
         # URL analysis details
         url_features = features.get('url_features', {})
         url_count = url_features.get('url_count', 0)
@@ -98,7 +98,7 @@ class EnhancedSpamDetector:
                 details['url_analysis'] += " Contains URL shorteners."
         else:
             details['url_analysis'] = "No URLs found."
-        
+
         # Email analysis details
         email_features = features.get('email_features', {})
         sender_analysis = email_features.get('sender_analysis')
@@ -110,7 +110,7 @@ class EnhancedSpamDetector:
                 details['email_analysis'] += " (disposable email)"
         else:
             details['email_analysis'] = "No sender email provided."
-        
+
         # Content analysis
         content_features = features.get('content_features', {})
         flags = []
@@ -118,26 +118,26 @@ class EnhancedSpamDetector:
             flags.append("excessive capitals")
         if content_features.get('has_excessive_punctuation'):
             flags.append("excessive punctuation")
-        
+
         if flags:
             details['content_analysis'] = f"Content has: {', '.join(flags)}"
         else:
             details['content_analysis'] = "Content appears normal."
-        
+
         return details
-    
-    def analyze_message(self, 
+
+    def analyze_message(self,
                        message: str,
                        subject: Optional[str] = None,
                        sender_email: Optional[str] = None) -> Dict:
         """
         Perform a detailed analysis of a message.
-        
+
         Args:
             message: The email message content
-            subject: Optional email subject line  
+            subject: Optional email subject line
             sender_email: Optional sender email address
-            
+
         Returns:
             Dictionary with detailed analysis results
         """
