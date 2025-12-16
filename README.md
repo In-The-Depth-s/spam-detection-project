@@ -23,6 +23,7 @@ separate module (`tests`)._
 ## Table of Contents
 
 - [Installation](#installation)
+- [Smart Auto-Configuration](#smart-auto-configuration)
 - [Usage](#usage)
     - [Training the Models](#training-the-models)
     - [Tests](#tests)
@@ -57,6 +58,60 @@ import nltk
 
 nltk.download('wordnet')
 nltk.download('stopwords')
+```
+
+## Smart Auto-Configuration
+
+**NEW in version 2.2.0**: Intelligent auto-configuration system that adapts to your hardware and use case!
+
+The package now includes a smart auto-configuration module that automatically optimizes settings based on:
+- **System Resources**: Detects available memory and CPU cores
+- **Use Case Profiles**: Pre-configured for development, production, high accuracy, or fast inference
+- **One-to-One Entity Configuration**: Configure individual models independently
+- **Human-Friendly Interface**: Easy-to-use API with validation and recommendations
+
+### Quick Start with Auto-Config
+
+```python
+from spam_detector_ai import AutoConfig, ConfigProfile
+
+# Create configuration with production profile (recommended)
+config = AutoConfig(profile=ConfigProfile.PRODUCTION)
+
+# View the configuration summary
+print(config.get_summary())
+
+# Get recommended models for your system
+recommended_models = config.recommend_models()
+print(f"Recommended models: {recommended_models}")
+
+# Get optimized settings
+vectorizer_config = config.get_vectorizer_config()
+training_config = config.get_training_config()
+```
+
+### Available Profiles
+
+- **DEVELOPMENT**: Fast training, lower accuracy - for development/testing
+- **PRODUCTION**: Balanced performance and accuracy - recommended default
+- **HIGH_ACCURACY**: Maximum accuracy, slower - for production use
+- **FAST_INFERENCE**: Quick predictions, lower accuracy - for high-volume
+
+### Model-Specific Configuration
+
+```python
+# Get configuration for a specific model (one-to-one entity)
+config = AutoConfig(profile=ConfigProfile.HIGH_ACCURACY)
+
+rf_config = config.get_model_config('random_forest')
+svm_config = config.get_model_config('svm')
+xgb_config = config.get_model_config('xgb')
+```
+
+For complete documentation, see [docs/AUTO_CONFIG.md](docs/AUTO_CONFIG.md) and run the example:
+
+```sh
+python examples/auto_config_usage.py
 ```
 
 ## Usage
