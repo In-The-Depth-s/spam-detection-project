@@ -8,6 +8,7 @@ This module provides intelligent configuration that adapts to:
 - User/developer preferences
 """
 
+import json
 import logging
 import os
 import platform
@@ -241,15 +242,26 @@ class AutoConfig:
     
     def recommend_models(self, dataset_size: Optional[int] = None) -> List[str]:
         """
-        Recommend models based on configuration and dataset size.
+        Recommend models based on configuration, system resources, and dataset size.
         
         Args:
-            dataset_size: Optional size of the dataset
+            dataset_size: Optional size of the dataset. If provided, recommends
+                         models based on dataset size (< 1000: lighter models,
+                         1000-10000: standard models, > 10000: all models)
             
         Returns:
             List of recommended model names
         """
         resource_tier = self.system_info.get('resource_tier', ResourceTier.MEDIUM)
+        
+        # Consider dataset size if provided
+        if dataset_size is not None:
+            if dataset_size < 1000:
+                # Small dataset - use simpler models
+                return ['naive_bayes', 'logistic_regression']
+            elif dataset_size > 50000 and resource_tier == ResourceTier.LOW:
+                # Large dataset with low resources - recommend lighter models
+                return ['naive_bayes', 'logistic_regression', 'svm']
         
         if self.profile == ConfigProfile.FAST_INFERENCE:
             return ['naive_bayes', 'logistic_regression']
@@ -353,8 +365,6 @@ Validation:
         Args:
             filepath: Path to save the configuration
         """
-        import json
-        
         export_data = {
             'profile': self.profile.value,
             'system_info': {k: v.value if isinstance(v, Enum) else v 

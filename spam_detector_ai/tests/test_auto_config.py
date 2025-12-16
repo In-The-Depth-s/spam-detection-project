@@ -156,7 +156,24 @@ class TestAutoConfig:
         prod_features = config_prod.get_vectorizer_config()['max_features']
         high_features = config_high.get_vectorizer_config()['max_features']
         
-        assert dev_features != prod_features or prod_features != high_features
+        # Verify that all three profiles have different max_features values
+        assert dev_features != prod_features
+        assert prod_features != high_features
+        assert dev_features != high_features
+    
+    def test_recommend_models_with_dataset_size(self):
+        """Test model recommendations based on dataset size"""
+        config = AutoConfig(profile=ConfigProfile.PRODUCTION)
+        
+        # Small dataset
+        models_small = config.recommend_models(dataset_size=500)
+        assert 'naive_bayes' in models_small
+        assert 'logistic_regression' in models_small
+        
+        # Large dataset with low resources (simulating)
+        models_large = config.recommend_models(dataset_size=100000)
+        assert isinstance(models_large, list)
+        assert len(models_large) > 0
 
 
 if __name__ == '__main__':
