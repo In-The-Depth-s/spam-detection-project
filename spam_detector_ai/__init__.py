@@ -7,3 +7,8 @@ __url__ = "https://github.com/adamspd/spam-detection-project"
 __api_url__ = "https://spam-detection-api.adamspierredavid.com"
 __version__ = "2.1.19"
 __test_version__ = False
+
+# Export AutoConfig for easy access
+from spam_detector_ai.auto_config import AutoConfig, ConfigProfile, create_auto_config
+
+__all__ = ['AutoConfig', 'ConfigProfile', 'create_auto_config']
