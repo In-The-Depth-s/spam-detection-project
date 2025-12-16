@@ -1,7 +1,7 @@
 # spam_detector_ai/loading_and_processing/email_validator.py
 
 import re
-from typing import Dict
+from typing import Dict, Any
 
 
 class EmailValidator:
@@ -52,7 +52,7 @@ class EmailValidator:
         """
         return bool(self.email_pattern.match(email))
     
-    def analyze_email(self, email: str) -> Dict[str, any]:
+    def analyze_email(self, email: str) -> Dict[str, Any]:
         """
         Analyze an email address for suspicious characteristics.
         

@@ -4,7 +4,7 @@ Enhanced spam detector that incorporates URL analysis, email validation,
 and content features for improved spam detection accuracy.
 """
 
-from typing import Optional, Dict
+from typing import Optional, Dict, Union
 from spam_detector_ai.prediction.predict import VotingSpamDetector
 from spam_detector_ai.loading_and_processing.feature_extractor import EnhancedFeatureExtractor
 
@@ -29,7 +29,7 @@ class EnhancedSpamDetector:
                 message: str,
                 subject: Optional[str] = None,
                 sender_email: Optional[str] = None,
-                return_details: bool = False) -> bool:
+                return_details: bool = False) -> Union[bool, Dict]:
         """
         Determine if a message is spam using enhanced features.
         

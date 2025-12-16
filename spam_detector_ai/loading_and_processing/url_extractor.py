@@ -2,7 +2,7 @@
 
 import re
 from urllib.parse import urlparse
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
 
 
 class URLExtractor:
@@ -52,7 +52,7 @@ class URLExtractor:
         urls = self.url_pattern.findall(text)
         return [url.strip() for url in urls if url.strip()]
     
-    def analyze_url(self, url: str) -> Dict[str, any]:
+    def analyze_url(self, url: str) -> Dict[str, Any]:
         """
         Analyze a URL for suspicious characteristics.
         
@@ -114,7 +114,7 @@ class URLExtractor:
         
         return analysis
     
-    def extract_and_analyze_urls(self, text: str) -> Tuple[List[str], Dict[str, any]]:
+    def extract_and_analyze_urls(self, text: str) -> Tuple[List[str], Dict[str, Any]]:
         """
         Extract URLs from text and provide aggregate analysis.
         

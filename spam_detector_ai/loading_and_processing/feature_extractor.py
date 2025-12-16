@@ -1,6 +1,6 @@
 # spam_detector_ai/loading_and_processing/feature_extractor.py
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 from spam_detector_ai.loading_and_processing.url_extractor import URLExtractor
 from spam_detector_ai.loading_and_processing.email_validator import EmailValidator
 
@@ -18,7 +18,7 @@ class EnhancedFeatureExtractor:
     def extract_features(self, 
                         text: str, 
                         subject: Optional[str] = None,
-                        sender_email: Optional[str] = None) -> Dict[str, any]:
+                        sender_email: Optional[str] = None) -> Dict[str, Any]:
         """
         Extract comprehensive features from email content.
         
@@ -64,7 +64,7 @@ class EnhancedFeatureExtractor:
         
         return features
     
-    def _extract_content_features(self, text: str, subject: Optional[str] = None) -> Dict[str, any]:
+    def _extract_content_features(self, text: str, subject: Optional[str] = None) -> Dict[str, Any]:
         """Extract basic content features."""
         features = {
             'text_length': len(text) if text else 0,

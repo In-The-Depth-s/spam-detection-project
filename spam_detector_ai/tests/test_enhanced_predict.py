@@ -8,9 +8,11 @@ class TestEnhancedSpamDetector(unittest.TestCase):
     Note: These are basic integration tests.
     """
     
-    def setUp(self):
-        # This will load all the ML models, so it may take a moment
-        self.detector = EnhancedSpamDetector()
+    @classmethod
+    def setUpClass(cls):
+        """Set up test fixtures once for the entire test class."""
+        # This will load all the ML models once, improving test performance
+        cls.detector = EnhancedSpamDetector()
     
     def test_basic_spam_detection(self):
         """Test basic spam detection functionality."""
