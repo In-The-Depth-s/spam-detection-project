@@ -281,6 +281,8 @@ If this happens, use an IDE to run the `test.py`file until a fix is implemented.
 
 ### Making Predictions
 
+#### Basic Usage
+
 To use the spam detector in your Django project:
 
 1. Import the `VotingSpamDetector` from the `prediction` module.
@@ -299,15 +301,208 @@ is_spam = spam_detector.is_spam(message)
 print(f"Is spam: {is_spam}")
 ```
 
+#### Enhanced Spam Detection (New in v2.2.0)
+
+The enhanced spam detector provides improved accuracy by analyzing URLs, email addresses, and content patterns:
+
+```python
+from spam_detector_ai.prediction.enhanced_predict import EnhancedSpamDetector
+
+# Create the enhanced spam detector
+detector = EnhancedSpamDetector()
+
+# Basic usage
+message = "Check out this amazing offer at http://suspicious-site.com"
+is_spam = detector.is_spam(message)
+
+# With additional context (recommended for best accuracy)
+is_spam = detector.is_spam(
+    message="Visit our site for great deals!",
+    subject="Limited Time Offer",
+    sender_email="deals@example.com"
+)
+
+# Get detailed analysis
+analysis = detector.analyze_message(
+    message="Click here to win prizes!",
+    subject="You won!",
+    sender_email="spam@tempmail.com"
+)
+
+print(f"Is Spam: {analysis['is_spam']}")
+print(f"Combined Score: {analysis['combined_score']}")
+print(f"Details: {analysis['details']}")
+```
+
+**Features of Enhanced Spam Detection:**
+- **URL Analysis**: Detects suspicious URLs including:
+  - IP-based URLs (e.g., `http://192.168.1.1`)
+  - URL shorteners (e.g., `bit.ly`, `tinyurl.com`)
+  - Suspicious TLDs (e.g., `.tk`, `.ml`, `.ga`)
+  - URLs with @ symbols (phishing technique)
+- **Email Validation**: Analyzes sender email addresses for:
+  - Disposable email providers
+  - Suspicious patterns in email addresses
+  - Free email providers tracking
+- **Content Analysis**: Detects spam indicators like:
+  - Excessive capitalization
+  - Excessive punctuation
+  - Multiple URLs
+- **Combined Scoring**: Intelligently combines traditional ML predictions with feature-based analysis
+
+**Example output:**
+```python
+{
+    'is_spam': True,
+    'combined_score': 0.85,
+    'ml_score': 1.0,
+    'feature_score': 0.65,
+    'details': {
+        'ml_verdict': 'Spam',
+        'url_analysis': 'Found 2 URL(s), 1 suspicious. Contains IP-based URLs.',
+        'email_analysis': 'Sender spam@tempmail.com has suspicion score: 0.50 (disposable email)',
+        'content_analysis': 'Content has: excessive punctuation'
+    }
+}
+```
+
+See `examples/enhanced_spam_detection_demo.py` for more examples.
+
+### Email Formatting and Legal Compliance (New in v2.2.0)
+
+The package now includes comprehensive email formatting, contact management, and legal compliance features:
+
+#### Multi-Language Email Formatting
+
+```python
+from spam_detector_ai.formatting import EmailFormatter
+
+# Create formatter with language preference
+formatter = EmailFormatter(language='es')  # en, es, fr, de supported
+
+# Format analysis results
+text_report = formatter.format_text_report(
+    analysis,
+    message="Spam content",
+    subject="Subject",
+    sender="sender@example.com"
+)
+
+# Generate HTML report
+html_report = formatter.format_html_report(analysis, message, subject, sender)
+
+# Export as JSON
+json_report = formatter.format_json_report(analysis, message, subject, sender)
+```
+
+#### Legal Compliance Templates
+
+```python
+from spam_detector_ai.formatting import LegalTemplates
+
+legal = LegalTemplates(language='en')
+
+# Get individual notices
+disclaimer = legal.get_disclaimer()
+privacy = legal.get_privacy_notice()
+terms = legal.get_terms_of_service()
+
+# Get formatted footer with all legal notices
+footer = legal.format_footer()
+```
+
+#### Contact Management with Legal State Tracking
+
+```python
+from spam_detector_ai.formatting import ContactManager
+
+manager = ContactManager(language='en')
+
+# Add contact
+contact = manager.add_contact(
+    email="user@example.com",
+    name="John Doe",
+    organization="Example Corp"
+)
+
+# Update legal acceptance states
+manager.update_legal_states(
+    "user@example.com",
+    terms=True,
+    privacy=True,
+    consent=True
+)
+
+# Check compliance
+status = manager.get_legal_status_report("user@example.com")
+print(f"Legally compliant: {status['legally_compliant']}")
+
+# Format communications
+message = manager.format_communication(
+    'legal_consent_request',
+    'user@example.com'
+)
+```
+
+#### Structured Messaging with Standards Compliance
+
+```python
+from spam_detector_ai.formatting import (
+    MessageFormatter,
+    MessageConstraints,
+    MessageStandard
+)
+
+formatter = MessageFormatter()
+
+# Configure constraints
+constraints = MessageConstraints(
+    max_line_length=78,  # RFC 5322 recommendation
+    max_lines=1000,
+    wrap_long_lines=True,
+    standard=MessageStandard.RFC5322
+)
+
+# Format message
+message = formatter.format_message(content, constraints)
+
+# Validate compliance
+report = formatter.validate_standards_compliance(
+    content,
+    MessageStandard.RFC5322
+)
+
+# Format with RFC 5322 header
+formatted = formatter.format_with_header(body, {
+    'From': 'sender@example.com',
+    'To': 'recipient@example.com',
+    'Subject': 'Test'
+})
+```
+
+See `examples/formatting_demo.py` for complete examples.
+
 ## Project Structure
 
 - `classifiers/`: Contains the different classifiers (Naive Bayes, Random Forest, SVM, XGB & Logistic Regression).
 - `data/`: Contains the sample dataset for training the classifiers.
-- `loading_and_processing/`: Contains utility functions for loading and preprocessing data.
+- `loading_and_processing/`: Contains utility functions for loading and preprocessing data, including:
+  - `preprocessor.py`: Text preprocessing with optional URL preservation
+  - `url_extractor.py`: URL extraction and analysis
+  - `email_validator.py`: Email address validation and analysis
+  - `feature_extractor.py`: Enhanced feature extraction for spam detection
 - `models/`: Contains the trained models and their vectorizers.
-- `prediction/`: Contains the main spam detector class.
+- `prediction/`: Contains the main spam detector classes:
+  - `predict.py`: Traditional spam detectors
+  - `enhanced_predict.py`: Enhanced spam detector with URL and email analysis
+- `formatting/`: Contains email formatting and legal compliance modules:
+  - `email_formatter.py`: Multi-language email report formatting (text, HTML, JSON)
+  - `legal_templates.py`: Legal compliance templates and notices
+  - `contact_manager.py`: Contact management with legal state tracking
+  - `structured_messaging.py`: RFC 5322 compliant message formatting
 - `tests/`: Contains scripts for testing
 - `tuning/`: Contains scripts for tuning the classifiers.
+- `examples/`: Contains usage examples and demos
 - `training/`: Contains scripts for training the classifiers.
 
 ## Contributing
